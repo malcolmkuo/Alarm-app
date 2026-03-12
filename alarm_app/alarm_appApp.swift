@@ -9,6 +9,9 @@ import SwiftUI
 
 @main
 struct alarm_appApp: App {
+    // This line connects the AppDelegate to the SwiftUI lifecycle
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
