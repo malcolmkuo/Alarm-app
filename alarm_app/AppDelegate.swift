@@ -4,17 +4,26 @@ import UIKit
 import SwiftUI
 import AlarmKit
 
+extension Notification.Name {
+    static let deviceTokenReceived = Notification.Name("deviceTokenReceived")
+}
+
 class AppDelegate: NSObject, UIApplicationDelegate {
+
+    /// Latest APNs device token — shared with AlarmViewModel so it can register with the server.
+    static var deviceToken: String?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         application.registerForRemoteNotifications()
         return true
     }
 
-    // Print device token so you can send it to your server for APNs
+    // Print device token and broadcast so AlarmViewModel can send it to the relay server
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         let token = deviceToken.map { String(format: "%02x", $0) }.joined()
         print("📱 Device token: \(token)")
+        AppDelegate.deviceToken = token
+        NotificationCenter.default.post(name: .deviceTokenReceived, object: token)
     }
 
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
@@ -35,9 +44,8 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
     @MainActor
     static func fireAlarm(seconds: Int) async {
-        let stop = AlarmButton(text: "Stop", textColor: .red, systemImageName: "stop.circle")
         let attrs = AlarmAttributes<EmptyMetadata>(
-            presentation: AlarmPresentation(alert: .init(title: "Alarm!", stopButton: stop)),
+            presentation: AlarmPresentation(alert: .init(title: "Alarm!")),
             tintColor: .red
         )
         _ = try? await AlarmManager.shared.schedule(id: UUID(), configuration: .timer(duration: TimeInterval(seconds), attributes: attrs))

@@ -1,0 +1,13 @@
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(cd /Users/malcolmkuo/Coding/alarm_app/alarm-server && npm install 2>&1)",
+      "Bash(xcodebuild -project alarm_app.xcodeproj -scheme alarm_app -destination \"platform=iOS Simulator,name=iPhone 16\" build 2>&1 | tail -40)",
+      "Bash(ipconfig getifaddr:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}
